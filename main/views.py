@@ -17,7 +17,7 @@ def index(request):
 
 def edit_images(request, session_id):
     """ renders Editor page for your images list """
-    upl_dir = os.path.join(settings.MEDIA_ROOT, session_id)
+    upl_dir = os.path.join(settings.IMAGES_UPLOAD_DIR, session_id)
     url = f"{settings.MEDIA_URL}{session_id}"
     image_files = os.listdir(upl_dir)
     images_info = [
@@ -36,7 +36,7 @@ def process_images(request):
         return redirect("main:index")
 
     session_id = request.POST.get("session")
-    upl_dir = os.path.join(settings.MEDIA_ROOT, session_id)
+    upl_dir = os.path.join(settings.IMAGES_UPLOAD_DIR, session_id)
     image_filenames = os.listdir(upl_dir)
     values = json.loads(request.POST["process"])
 
@@ -105,9 +105,9 @@ def submit_images(request):
 
 def save_image(image, user_id):
     """ saving image file """
-    path = os.path.join(settings.MEDIA_ROOT, user_id, image.name)
+    path = os.path.join(settings.IMAGES_UPLOAD_DIR, user_id, image.name)
     os.makedirs(
-        os.path.join(settings.MEDIA_ROOT, user_id),
+        os.path.join(settings.IMAGES_UPLOAD_DIR, user_id),
         exist_ok=True
     )
     with open(path, "wb") as file:
