@@ -13,12 +13,14 @@ def my_callback(sender, **kwargs):
         f"{settings.IMAGES_UPLOAD_DIR}/{i}"
         for i in os.listdir(settings.IMAGES_UPLOAD_DIR)
     ]
-    res = [f"Result/{i}" for i in os.listdir("Result")]
+    res = [
+        f"{settings.IMAGES_RESULT_DIR}/{i}"
+        for i in os.listdir(settings.IMAGES_RESULT_DIR)
+    ]
     for file in up + res:
         created_at = datetime.fromtimestamp(os.stat(file).st_ctime)
         if (now - created_at).seconds > settings.IMG_LIFE_SEC:
             shutil.rmtree(file)
-            # os.removedirs(file)
 
 
 class MainConfig(AppConfig):
