@@ -1,0 +1,20 @@
+html,body{
+    padding:0;
+    margin:0;
+}
+body {
+	background:url("../pics/basic2-032_scissors_cut-128.png");
+}
+
+.task{
+    position:absolute;
+    top:1%;
+    right:1%;
+    z-index:1;
+}
+
+#image{
+    border:1px solid red;
+    overflow:hidden;
+    cursor:crosshair;
+}
