@@ -5,3 +5,8 @@
 *.pyc
 
 .env
+
+*.jpg
+*.jpeg
+*.png
+*.bmp
