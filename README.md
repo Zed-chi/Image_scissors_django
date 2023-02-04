@@ -12,6 +12,7 @@ python3.7+
 
 Установка:
 `pip install -r requirements`
+
 создать файлик с именем `.env` и прописать переменные
 ```
 IMAGES_UPLOAD_DIR=<Папка для хранения фото>
