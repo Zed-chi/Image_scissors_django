@@ -17,7 +17,11 @@ def index(request):
 
 def edit_images(request, session_id):
     """ renders Editor page for your images list """
-    upl_dir = os.path.join(settings.IMAGES_UPLOAD_DIR, session_id)
+    upl_dir = os.path.join(
+        settings.BASE_DIR,
+        settings.IMAGES_UPLOAD_DIR,
+        session_id
+    )
     url = f"{settings.MEDIA_URL}{session_id}"
     image_files = os.listdir(upl_dir)
     images_info = [
@@ -36,13 +40,20 @@ def process_images(request):
         return redirect("main:index")
 
     session_id = request.POST.get("session")
-    upl_dir = os.path.join(settings.IMAGES_UPLOAD_DIR, session_id)
+    upl_dir = os.path.join(
+        settings.BASE_DIR,
+        settings.IMAGES_UPLOAD_DIR,
+        session_id
+    )
     image_filenames = os.listdir(upl_dir)
     values = json.loads(request.POST["process"])
 
     for filename in image_filenames:
         attrs = values[filename]
-        filepath = os.path.join(upl_dir, filename)
+        filepath = os.path.join(
+            upl_dir,
+            filename,
+        )
         image = Image.open(filepath)
         width, height = image.size
         rows = int(attrs["row"])
@@ -53,34 +64,40 @@ def process_images(request):
         top_offset = round((height / 100) * (int(attrs["top"])))
 
         # Создание изображений
-        result_dir = f"{settings.IMAGES_RESULT_DIR}/{session_id}"
+        result_dir = os.path.join(
+            settings.BASE_DIR,
+            settings.IMAGES_RESULT_DIR,
+            session_id,
+        )
         os.makedirs(result_dir, exist_ok=True)
         for row in range(rows):
+            row_left_offset = left_offset
             for col in range(cols):
                 region = image.crop(
                     [
-                        left_offset,
+                        row_left_offset,
                         top_offset,
-                        left_offset + img_width,
+                        row_left_offset + img_width,
                         top_offset + img_height,
                     ]
                 )
                 name, ext = filename.split(".")
                 tile_path = (
-                    f"{result_dir}/{name}-{left_offset}-{top_offset}.{ext}"
+                    f"{result_dir}/{name}-{row_left_offset}-{top_offset}.{ext}"
                 )
                 region.save(tile_path)
-                left_offset += img_width
+                row_left_offset += img_width
             top_offset += img_height
     result_images = os.listdir(result_dir)
-    with ZipFile(f"{settings.IMAGES_RESULT_DIR}{session_id}.zip", "w") as arc:
+
+    with ZipFile(f"{result_dir}.zip", "w") as arc:
         for path in result_images:
             arc.write(f"{result_dir}/{path}")
     try:
-        with open(f"{session_id}.zip", "rb") as arc:
+        with open(f"{result_dir}.zip", "rb") as arc:
             file_data = arc.read()
         response = HttpResponse(file_data, content_type="application/zip")
-        response["Content-Disposition"] = f'attachment; filename="{session_id}.zip"'
+        response["Content-Disposition"] = f'attachment; filename="{result_dir}.zip"'
     except IOError:
         response = HttpResponseNotFound("<h1>File not exist</h1>")
     return response
@@ -105,10 +122,18 @@ def submit_images(request):
 
 def save_image(image, user_id):
     """ saving image file """
-    path = os.path.join(settings.IMAGES_UPLOAD_DIR, user_id, image.name)
+    path = os.path.join(
+        settings.BASE_DIR,
+        settings.IMAGES_UPLOAD_DIR,
+        user_id,
+        image.name
+    )
     os.makedirs(
-        os.path.join(settings.IMAGES_UPLOAD_DIR, user_id),
-        exist_ok=True
+        os.path.join(
+            settings.BASE_DIR,
+            settings.IMAGES_UPLOAD_DIR,
+            user_id,
+        ), exist_ok=True
     )
     with open(path, "wb") as file:
         file.write(image.read())
