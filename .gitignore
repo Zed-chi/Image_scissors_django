@@ -10,3 +10,4 @@
 *.jpeg
 *.png
 *.bmp
+Pipfile.lock
